@@ -136,7 +136,7 @@
 
   .player-row {
     display: grid;
-    grid-template-columns: 6fr 60px 100px 36px;
+    grid-template-columns: 6fr 100px 100px 36px;
     gap: 8px;
     align-items: center;
     margin-bottom: 8px;
@@ -402,9 +402,9 @@
 
   <!-- Players Section -->
   <div class="section">
-    <div style="display:grid;grid-template-columns:6fr 60px 100px 36px;gap:8px;margin-bottom:10px;padding-right:44px;">
+    <div style="display:grid;grid-template-columns:6fr 100px 100px 36px;gap:8px;margin-bottom:10px;padding-right:44px;">
       <div class="section-label" style="margin-bottom:0;text-align:center;">Player</div>
-      <div class="section-label" style="margin-bottom:0;text-align:center;">March</div>
+      <div class="section-label" style="margin-bottom:0;text-align:center;">March (min : sec)</div>
       <div class="section-label" style="margin-bottom:0;text-align:center;">Ratio</div>
     </div>
     <div id="players-list"></div>
@@ -482,11 +482,22 @@
     row.id = `player-${id}`;
     row.innerHTML = `
       <input type="text" placeholder="Name" value="${name}" id="name-${id}">
-      <input type="number" placeholder="Secs" value="${seconds}" id="sec-${id}" min="0">
+      <div style="display:flex;gap:4px;align-items:center;">
+        <input type="number" inputmode="numeric" placeholder="min" id="min-${id}" min="0" style="flex:1;min-width:0;text-align:center;">
+        <span style="color:var(--muted);font-weight:600;font-size:13px;">:</span>
+        <input type="number" inputmode="numeric" placeholder="sec" id="sec-${id}" min="0" max="59" style="flex:1;min-width:0;text-align:center;">
+      </div>
       <input type="text" placeholder="Ratio" value="${ratio}" id="ratio-${id}">
       <button class="btn-icon" onclick="removePlayer(${id})">×</button>
     `;
     list.appendChild(row);
+  }
+
+  function parseMarchTime(minVal, secVal) {
+    const mins = parseInt(minVal) || 0;
+    const secs = parseInt(secVal) || 0;
+    if (mins === 0 && secs === 0) return NaN;
+    return mins * 60 + secs;
   }
 
   function removePlayer(id) {
@@ -538,7 +549,7 @@
     for (let row of rows) {
       const id = row.id.split('-')[1];
       const name = document.getElementById(`name-${id}`).value.trim();
-      const secs = parseInt(document.getElementById(`sec-${id}`).value);
+      const secs = parseMarchTime(document.getElementById(`min-${id}`)?.value || '0', document.getElementById(`sec-${id}`).value);
       const ratio = document.getElementById(`ratio-${id}`).value.trim();
       // Skip empty rows
       if (!name && isNaN(secs)) continue;
@@ -638,4 +649,4 @@
   addPlayer(); addPlayer();
 </script>
 </body>
-      </html>
+</html>
